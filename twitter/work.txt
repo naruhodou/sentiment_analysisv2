@@ -1,0 +1,14 @@
+Word analysis:
+Most common words (stop words should be removed and the words should be stemmed) Should be shown as a bar graph
+Frequency of most common bigrams
+Frequency of most common trigrams
+Trending data
+Positively Trending words along with their frequency distribution
+Negatively trending words along with their frequency distribution
+Sentiment analysis
+Positive and negative words that contribute to sentiment in the reviews
+Positive and negative bigrams that contribute to sentiment in the reviews
+Positive and negative trigrams that contribute to sentiment in the reviews
+Most common bigrams preceded by the word not, no, never, without (Take any other negative words that come up in the common words, bigrams, trigrams etc.)
+Most common trigrams preceded by the word not, no, never, without (Take any other negative words that come up in the common words, bigrams, trigrams etc.)
+Generate sentiment score for each of the review. What is the average sentiment score? Which is the best review? Which is the worst review?

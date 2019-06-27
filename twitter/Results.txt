@@ -1,0 +1,5 @@
+Total Tweets: 770
+Tweets per week: 598.8888888888888
+Tweets per month: 2602.314814814815
+Tweets per year: 31227.777777777777
+Average retweet count: 8.568831168831169
