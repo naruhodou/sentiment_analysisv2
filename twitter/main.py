@@ -159,8 +159,27 @@ class Tweet_Data:
         lst = word_counter.most_common(10)
         plot_data(lst)
 
-    def most_common_ngrams(n):
-        pass
+    def most_common_ngrams(self, n):
+        ngram_count = {}
+        for tweet in self.text:
+            ngrams = nltk.ngrams(tweet.split(), n)
+            for ngram in ngrams:
+                if len(ngram) == 0:
+                    continue
+                if ngram not in ngram_count:
+                    ngram_count[ngram] = 1
+                else:
+                    ngram_count[ngram] += 1
+        ngram_counter = collections.Counter(ngram_count)
+        num = 18 // n
+        lst = ngram_counter.most_common(num)
+        for i in range(num):
+            s = ''
+            for word in lst[i][0]:
+                s += ' ' + word
+            s = s[1:]
+            lst[i] = (s, lst[i][1])
+        plot_data(lst)
 
 tweets = Tweet_Data('tweets.csv')
 
@@ -175,4 +194,5 @@ tweets = Tweet_Data('tweets.csv')
 ###########################
 
 tweets.clean_tweets()
-tweets.most_common_words()
+# tweets.most_common_words()
+# tweets.most_common_ngrams(3)
