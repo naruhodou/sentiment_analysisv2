@@ -14,7 +14,8 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 import re
 import collections
-import pandas as pd
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
 auth = OAuthHandler(consumer_key, consumer_secret)
@@ -65,6 +66,25 @@ def plot_data(lst):
                     ha='center', va='bottom')
 
     autolabel(rects1)
+    plt.show()
+
+def get_plot(f, g, s):
+    x = sorted(f, key=f.__getitem__, reverse=True)
+    y = []
+    for i in x:
+        y.append(f[i])
+    n = min(len(x), 10)
+    plt.subplot(2, 1, 1)
+    plt.title('Positive ' + s)
+    plt.barh(x[:n], y[:n])
+    x = sorted(g, key=g.__getitem__, reverse=True)
+    y = []
+    for i in x:
+        y.append(g[i])
+    n = min(len(x), 10)
+    plt.subplot(2, 1, 2)
+    plt.barh(x[:n], y[:n])
+    plt.title('Negitive ' + s)
     plt.show()
 
 class Tweet_Data:
@@ -142,6 +162,7 @@ class Tweet_Data:
                 temp += ' ' + ps.stem(cur_word)
             temp = temp[1:]
             temp = re.sub(r"(?:\@|https?\://)\S+", "", temp)
+            temp = re.sub(r'[^\w\s]','', temp)
             self.text[i] = temp
     
     def most_common_words(self):
@@ -180,6 +201,47 @@ class Tweet_Data:
             s = s[1:]
             lst[i] = (s, lst[i][1])
         plot_data(lst)
+    
+    def ngram_polarity(self, n):
+        raw_data = ""
+        for tweet in self.text:
+            raw_data += tweet
+        ngrams = nltk.ngrams(raw_data.split(), n)
+        fdist = nltk.FreqDist(ngrams)
+        pos = []
+        neg = []
+        sid = SentimentIntensityAnalyzer()    
+        pos_bigrams=[]
+        neg_bigrams=[]
+        pf = {}
+        nf = {}
+        for key in fdist:
+            ngram = ""
+            for word in key:
+                ngram += ' ' + word
+            ngram = ngram[1:]
+            if (sid.polarity_scores(ngram)['compound']) >= 0.5:
+                if ngram not in pf:
+                    pf[ngram] = 1
+                else:
+                    pf[ngram] += 1
+            elif (sid.polarity_scores(ngram)['compound']) <= -0.5:
+                if ngram not in nf:
+                    nf[ngram] = 1
+                else:
+                    nf[ngram] += 1
+        s = ""
+        if n == 1:
+            s = "Words"
+        elif n == 2:
+            s = "Bigrams"
+        elif n == 3:
+            s = "Trigrams"
+        
+        get_plot(pf, nf, s)
+    
+    def sentiment_analysis(self):
+        pass
 
 tweets = Tweet_Data('tweets.csv')
 
@@ -194,5 +256,4 @@ tweets = Tweet_Data('tweets.csv')
 ###########################
 
 tweets.clean_tweets()
-# tweets.most_common_words()
-# tweets.most_common_ngrams(3)
+tweets.ngram_polarity(1)
