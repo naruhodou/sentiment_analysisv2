@@ -16,6 +16,8 @@ import re
 import collections
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from wordcloud import WordCloud 
+import pandas as pd 
 
 
 auth = OAuthHandler(consumer_key, consumer_secret)
@@ -68,6 +70,7 @@ def plot_data(lst):
     autolabel(rects1)
     plt.show()
 
+# Plots two graphs together
 def get_plot(f, g, s):
     x = sorted(f, key=f.__getitem__, reverse=True)
     y = []
@@ -87,6 +90,11 @@ def get_plot(f, g, s):
     plt.title('Negitive ' + s)
     plt.show()
 
+def sentiment_score(sentence):
+    analyser = SentimentIntensityAnalyzer()
+    score = analyser.polarity_scores(sentence)
+    return score['compound']
+
 class Tweet_Data:
     def __init__(self, file):
         self.file = file
@@ -95,12 +103,16 @@ class Tweet_Data:
         self.date = []
         self.retweet_count = []
         self.text = []
+        self.real_text = []
         self.hashtags = []
+        self.pos_tweets = 0
+        self.neg_tweets = 0
         self.no_of_tweets = 0
         for row in data:
             self.date.append(row[0])
             self.retweet_count.append(int(row[1]))
             self.text.append(row[2])
+            self.real_text.append(row[2])
             self.no_of_tweets += 1
         f.close()
     def get_weeks(self):
@@ -240,8 +252,71 @@ class Tweet_Data:
         
         get_plot(pf, nf, s)
     
-    def sentiment_analysis(self):
-        pass
+    def best_and_worst_tweet(self):
+        best_score = -float('inf')
+        best_tweet = ""
+        for i in range(len(self.text)):
+            score = sentiment_score(self.text[i])
+            if score >= 0.5:
+                self.pos_tweets += 1
+            elif score <= -0.5:
+                self.neg_tweets += 1
+            if score > best_score:
+                best_tweet, best_score = self.real_text[i][2:], score
+        print("Best Review(score = {}): ".format(best_score), best_tweet)
+
+        worst_score = float('inf')
+        worst_tweet = ""
+        for i in range(len(self.text)):
+            score = sentiment_score(self.text[i])
+            if score < worst_score:
+                worst_tweet, worst_score = self.real_text[i][2:], score
+        print("Worst Review(score = {}): ".format(worst_score), worst_tweet)
+    
+    def ngram_with_neg(self, n, s1):
+        n += 1
+        words = ""
+        for tweet in self.text:
+            words += tweet
+        ng = nltk.ngrams(words.split(), n)
+        f = {}
+        sid = SentimentIntensityAnalyzer()
+        for g in ng:
+            s = ""
+            for i in range(1, n):
+                s += (g[i] + ' ')
+            s = s[:len(s) - 1]
+            if (sid.polarity_scores(g[0])['compound']) <= -0.5:
+                if s not in f:
+                    f[s] = 1
+                else:
+                    f[s] += 1
+        x = sorted(f, key=f.__getitem__, reverse=True)
+        y = []
+        for i in x:
+            y.append(f[i])
+        n = min(len(x), 10)
+        plt.title(s1 + ' preceded with negative words')
+        plt.barh(x[:n], y[:n])
+        plt.show()
+
+    def word_cloud(self):
+        comment_words = ' ' 
+        for val in self.text: 
+            tokens = val.split() 
+            for i in range(len(tokens)): 
+                tokens[i] = tokens[i].lower() 
+            for words in tokens: 
+                comment_words = comment_words + words + ' '
+        wordcloud = WordCloud(width = 800, height = 800, 
+                        background_color ='white', 
+                        min_font_size = 10).generate(comment_words)                     
+        plt.figure(figsize = (8, 8), facecolor = None) 
+        plt.imshow(wordcloud) 
+        plt.axis("off") 
+        plt.tight_layout(pad = 0) 
+        
+        plt.show() 
 
 tweets = Tweet_Data('tweets.csv')
 
@@ -256,4 +331,10 @@ tweets = Tweet_Data('tweets.csv')
 ###########################
 
 tweets.clean_tweets()
-tweets.ngram_polarity(1)
+# tweets.ngram_polarity(1)
+# tweets.best_and_worst_tweet()
+# print("Number of positive tweets: ", tweets.pos_tweets)
+# print("Number of negative tweets: ", tweets.neg_tweets)
+# tweets.ngram_with_neg(2, 'Bigrams')
+# tweets.ngram_with_neg(3, 'Trigrams')
+tweets.word_cloud()

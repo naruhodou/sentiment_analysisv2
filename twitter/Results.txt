@@ -1,5 +1,9 @@
-Total Tweets: 770
-Tweets per week: 598.8888888888888
-Tweets per month: 2602.314814814815
-Tweets per year: 31227.777777777777
-Average retweet count: 8.568831168831169
+Total Tweets: 831
+Tweets per week: 1454.25
+Tweets per month: 6319.0625
+Tweets per year: 75828.75
+Average retweet count: 8.990373044524668
+Best Review(score = 0.891):  Choose a perfect holiday destination to get the best feels!\n#TourMyIndia\n#Trekkininindia\n#travel #travelling\xe2\x80\xa6 https://t.co/CGKIRXWbA5'
+Worst Review(score = -0.6908):  Got to take some alpacas for a walk today! They were very polite and didn't try to kill us 10/10\n.\n.\n.\n.\n#alpaca\xe2\x80\xa6 https://t.co/IXiUb3XCdd"
+Number of positive tweets:  178
+Number of negative tweets:  12
